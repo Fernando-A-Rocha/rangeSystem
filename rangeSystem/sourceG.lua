@@ -8,6 +8,7 @@
 
 --------------------------------------------------- CONFIG ----------------------------------------------------
 local ENABLE_DEBUG = true
+local DEBUG_SYNC_DATA_NAME = "rangeSystem:syncedTable"
 local COMMAND_DEBUG = "showranges"
 local DETECT_ELEMENT_TYPES = {"player", "ped", "vehicle", "object", "pickup", "marker"}
 ---------------------------------------------------------------------------------------------------------------
@@ -27,12 +28,12 @@ addEvent(isClientFile and "onClientRangeLeave" or "onRangeLeave", true)
 if ENABLE_DEBUG then
 	if not isClientFile then
 		syncRangesWithClients = function()
-			setElementData(resourceRoot, "serversideRanges", ranges)
+			setElementData(resourceRoot, DEBUG_SYNC_DATA_NAME, ranges)
 		end
 	else
 		local syncedRanges = {}
 		addEventHandler("onClientElementDataChange", resourceRoot, function(theKey, oldValue, newValue)
-			if theKey == "serversideRanges" then
+			if theKey == DEBUG_SYNC_DATA_NAME then
 				syncedRanges = newValue or {}
 			end
 		end, false)
@@ -227,7 +228,6 @@ function elementInRange(rangeElement, theElement)
 	local range = getRange(rangeElement)
 	if range and not range.elements[theElement] then
 		range.elements[theElement] = {result = true, element = theElement}
-		syncRangesWithClients()
 		triggerEvent(isClientFile and "onClientRangeHit" or "onRangeHit",
 			rangeElement, theElement,
 			getElementDimension(theElement) == getElementDimension(rangeElement),
@@ -241,7 +241,6 @@ function elementOutRange(rangeElement, theElement)
 	local range = getRange(rangeElement)
 	if range and range.elements[theElement] then
 		range.elements[theElement] = nil
-		syncRangesWithClients()
 		triggerEvent(isClientFile and "onClientRangeLeave" or "onRangeLeave",
 		rangeElement, theElement,
 		getElementDimension(theElement) == getElementDimension(rangeElement),
