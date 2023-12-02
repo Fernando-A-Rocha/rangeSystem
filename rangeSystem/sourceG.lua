@@ -120,9 +120,23 @@ local function handleElementDestroyed()
 	end
 end
 addEventHandler("onElementDestroy", root, handleElementDestroyed)
+addEventHandler("onClientElementDestroy", root, handleElementDestroyed)
 
 -- Exported
 function createRange(x, y, z, radius, dimension, interior, data)
+	assert(type(x)=="number", "Bad argument @ 'createRange' [expected number at argument 1, got "..type(x).."]")
+	assert(type(y)=="number", "Bad argument @ 'createRange' [expected number at argument 2, got "..type(y).."]")
+	assert(type(z)=="number", "Bad argument @ 'createRange' [expected number at argument 3, got "..type(z).."]")
+	assert(type(radius)=="number", "Bad argument @ 'createRange' [expected number at argument 4, got "..type(radius).."]")
+	if dimension then
+		assert(type(dimension)=="number", "Bad argument @ 'createRange' [expected number at argument 5, got "..type(dimension).."]")
+	end
+	if interior then
+		assert(type(interior)=="number", "Bad argument @ 'createRange' [expected number at argument 6, got "..type(interior).."]")
+	end
+	if data then
+		assert(type(data)=="table", "Bad argument @ 'createRange' [expected table at argument 7, got "..type(data).."]")
+	end
 	local rangeElement = createElement("range")
 	setElementPosition(rangeElement, x, y, z)
 	if dimension then
@@ -131,7 +145,7 @@ function createRange(x, y, z, radius, dimension, interior, data)
 	if interior then
 		setElementInterior(rangeElement, interior)
 	end
-	ranges[rangeElement] = {data = data, radius = radius, elements = {}, color=tocolor(math.random(1,255)-1, math.random(1,255)-1, math.random(1,255)-1, 255)}
+	ranges[rangeElement] = {data = (data or {}), radius = radius, elements = {}, color=tocolor(math.random(1,255)-1, math.random(1,255)-1, math.random(1,255)-1, 255)}
 	setElementResource(rangeElement, sourceResource)
 	syncRangesWithClients()
 	return rangeElement
